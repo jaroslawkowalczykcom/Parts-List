@@ -10,6 +10,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -140,11 +141,10 @@ public class MainApp extends javax.swing.JFrame {
                     blockList.add(new Block(Integer.parseInt(dataRow[0]), dataRow[1], Integer.parseInt(dataRow[2]), Integer.parseInt(dataRow[3]), Integer.parseInt(dataRow[4]), Integer.parseInt(dataRow[5])));
                     model.addRow(dataRow);
                 }
-                bufferedReader.close();
                 reader.close();                
             }catch (Exception ex){
                 JOptionPane.showMessageDialog(null, ex.getMessage());
-                System.out.println(ex.getStackTrace());
+                ex.printStackTrace();
             }
         }
     }//GEN-LAST:event_btnLoadMouseClicked
@@ -153,21 +153,38 @@ public class MainApp extends javax.swing.JFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         int result = fileChooser.showSaveDialog(null);
+        
+        
+        
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             try {
                 FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
                 HSSFWorkbook wb = new HSSFWorkbook(fileInputStream);
                 HSSFSheet worksheet = wb.getSheetAt(0);
-                Cell cell = null;
-                cell = worksheet.getRow(10).getCell(0);
-                cell.setCellValue("1");
+                Cell cellNrPoz = null;
+                Cell cellSrednica = null;
+                Cell cellDlugosc = null;
+                Cell cellSztuki = null;
                 
+                cellNrPoz = worksheet.getRow(3).getCell(0);
+                cellSrednica = worksheet.getRow(3).getCell(1);
+                cellDlugosc = worksheet.getRow(3).getCell(2);
+                cellSztuki = worksheet.getRow(3).getCell(3);
+                
+                cellNrPoz.setCellValue(blockList.get(0).getNrPoz());
+                cellSrednica.setCellValue(blockList.get(0).getSrednica());
+                cellDlugosc.setCellValue(blockList.get(0).getDlugosc());
+                cellSztuki.setCellValue(blockList.get(0).getSztuki());
+                
+                HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
+                wb.createSheet("sheet");
                 fileInputStream.close();
-                FileOutputStream outputFile = new FileOutputStream(selectedFile.getAbsolutePath());
-                wb.write(outputFile);
-                outputFile.close();
                 
+                FileOutputStream fileOutputStream = new FileOutputStream(selectedFile.getAbsolutePath());
+                wb.write(fileOutputStream);
+                fileOutputStream.close();
+                JOptionPane.showMessageDialog(null, "Plik .xls został zaktualizowany");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
                 ex.printStackTrace();
