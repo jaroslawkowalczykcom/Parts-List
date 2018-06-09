@@ -2,13 +2,17 @@ package filereader;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 
 /**
  * @author Jarosław Kowalczyk
@@ -17,7 +21,6 @@ public class MainApp extends javax.swing.JFrame {
     
     private List<BlockHeader> blockListHeader = new ArrayList<>();
     private List<Block> blockList = new ArrayList<>();
-
  
     public MainApp() {
         initComponents();
@@ -32,6 +35,7 @@ public class MainApp extends javax.swing.JFrame {
         jTable = new javax.swing.JTable();
         btnLoad = new javax.swing.JButton();
         jLabel_FilePath = new javax.swing.JLabel();
+        btnSave = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -55,6 +59,13 @@ public class MainApp extends javax.swing.JFrame {
 
         jLabel_FilePath.setText("File path");
 
+        btnSave.setText("Zapisz");
+        btnSave.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnSaveMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -66,19 +77,25 @@ public class MainApp extends javax.swing.JFrame {
                         .addComponent(jLabel_FilePath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnLoad, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 30, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 453, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnLoad, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                            .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE))))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btnLoad)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
+                        .addComponent(btnLoad)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnSave)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 302, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addComponent(jLabel_FilePath)
                 .addContainerGap())
         );
@@ -97,24 +114,6 @@ public class MainApp extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-   
-//    public List<BlockHeader> addBlockListHeaderFromFile() {
-//        JFileChooser fileChooser = new JFileChooser();
-//        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
-//        int result = fileChooser.showOpenDialog(null);
-//        
-//        if (result == JFileChooser.APPROVE_OPTION) {
-//            File selectedFile = fileChooser.getSelectedFile();
-//            try {
-//                FileReader reader = new FileReader(selectedFile.getAbsolutePath());
-//                BufferedReader bufferReader = new BufferedReader(reader);
-//            } catch (Exception ex) {
-//                JOptionPane.showMessageDialog(null, ex.getMessage());
-//            }
-//        }
-//        
-//        return blockListHeader;
-//    }
     
     private void btnLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoadMouseClicked
         JFileChooser fileChooser = new JFileChooser();
@@ -132,7 +131,6 @@ public class MainApp extends javax.swing.JFrame {
                 blockListHeader.add(new BlockHeader(columnName[0], columnName[1], columnName[2], columnName[3], columnName[4], columnName[5]));
                 DefaultTableModel model = (DefaultTableModel)jTable.getModel();
                 model.setColumnIdentifiers(columnName);
-               
                 
                 Object[] tableLines = bufferedReader.lines().toArray();
                 
@@ -142,18 +140,40 @@ public class MainApp extends javax.swing.JFrame {
                     blockList.add(new Block(Integer.parseInt(dataRow[0]), dataRow[1], Integer.parseInt(dataRow[2]), Integer.parseInt(dataRow[3]), Integer.parseInt(dataRow[4]), Integer.parseInt(dataRow[5])));
                     model.addRow(dataRow);
                 }
-            
+                bufferedReader.close();
                 reader.close();                
-                
             }catch (Exception ex){
                 JOptionPane.showMessageDialog(null, ex.getMessage());
                 System.out.println(ex.getStackTrace());
             }
-            // TEST
-            System.out.println(">>>>" + blockListHeader.get(0));
-            System.out.println(">>>>" + blockList.get(2).getSztuki());
         }
     }//GEN-LAST:event_btnLoadMouseClicked
+
+    private void btnSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSaveMouseClicked
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
+        int result = fileChooser.showSaveDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
+                HSSFWorkbook wb = new HSSFWorkbook(fileInputStream);
+                HSSFSheet worksheet = wb.getSheetAt(0);
+                Cell cell = null;
+                cell = worksheet.getRow(10).getCell(0);
+                cell.setCellValue("1");
+                
+                fileInputStream.close();
+                FileOutputStream outputFile = new FileOutputStream(selectedFile.getAbsolutePath());
+                wb.write(outputFile);
+                outputFile.close();
+                
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_btnSaveMouseClicked
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -189,6 +209,7 @@ public class MainApp extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLoad;
+    private javax.swing.JButton btnSave;
     private javax.swing.JLabel jLabel_FilePath;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;

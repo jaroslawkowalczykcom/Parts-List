@@ -19,10 +19,6 @@ public class BlockHeader {
         this.srednica = srednica;
         this.sztuki = sztuki;
     }
-
-//    public BlockHeader(String inputRecord) {
-//        String[] fields = inputRecord.split("\\s+");
-//    }
     
     public String getLiczba() {
         return this.liczba;

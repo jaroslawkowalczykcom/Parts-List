@@ -19,10 +19,6 @@ public class Block {
         this.srednica = srednica;
         this.sztuki = sztuki;
     }
-
-//    public Block(String inputRecord) {
-//        String[] fields = inputRecord.split("\\s+");
-//    }
     
     public int getLiczba() {
         return this.liczba;
