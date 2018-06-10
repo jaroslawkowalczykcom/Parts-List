@@ -66,7 +66,7 @@ public class Block {
     
     public void setSztuki(int sztuki) {
         this.sztuki = sztuki;
-    } 
+    }
     
     public String toString(){
         return "Blok: " +getLiczba() + " " + getNazwa() + " " + getDlugosc() + " " + getNrPoz() + " " + getSrednica() + " " + getSztuki();

@@ -6,11 +6,15 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
+import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,10 +23,10 @@ import org.apache.poi.ss.usermodel.Cell;
  * @author Jarosław Kowalczyk
  */
 public class MainApp extends javax.swing.JFrame {
-    
+
     private List<BlockHeader> blockListHeader = new ArrayList<>();
     private List<Block> blockList = new ArrayList<>();
- 
+
     public MainApp() {
         initComponents();
     }
@@ -115,34 +119,90 @@ public class MainApp extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-    
+
+    private static void copyRow(HSSFWorkbook workbook, HSSFSheet worksheet, int sourceRowNum, int destinationRowNum) {
+        // Get the source / new row
+        HSSFRow newRow = worksheet.getRow(destinationRowNum);
+        HSSFRow sourceRow = worksheet.getRow(sourceRowNum);
+
+        // If the row exist in destination, push down all rows by 1 else create a new row
+        if (newRow != null) {
+            worksheet.shiftRows(destinationRowNum, worksheet.getLastRowNum(), 1);
+        } else {
+            newRow = worksheet.createRow(destinationRowNum);
+        }
+
+        // Loop through source columns to add to new row
+        for (int i = 0; i < sourceRow.getLastCellNum(); i++) {
+            // Grab a copy of the old/new cell
+            HSSFCell oldCell = sourceRow.getCell(i);
+            HSSFCell newCell = newRow.createCell(i);
+
+            // If the old cell is null jump to next cell
+            if (oldCell == null) {
+                newCell = null;
+                continue;
+            }
+
+            // Copy style from old cell and apply to new cell
+            HSSFCellStyle newCellStyle = workbook.createCellStyle();
+            newCellStyle.cloneStyleFrom(oldCell.getCellStyle());
+
+            newCell.setCellStyle(newCellStyle);
+
+            // Set the cell data value
+            switch (oldCell.getCellType()) {
+                case Cell.CELL_TYPE_BLANK:
+                    newCell.setCellValue(oldCell.getStringCellValue());
+                    break;
+                case Cell.CELL_TYPE_BOOLEAN:
+                    newCell.setCellValue(oldCell.getBooleanCellValue());
+                    break;
+                case Cell.CELL_TYPE_ERROR:
+                    newCell.setCellErrorValue(oldCell.getErrorCellValue());
+                    break;
+                case Cell.CELL_TYPE_FORMULA:
+                    newCell.setCellFormula(oldCell.getCellFormula());
+                    break;
+                case Cell.CELL_TYPE_NUMERIC:
+                    newCell.setCellValue(oldCell.getNumericCellValue());
+                    break;
+                case Cell.CELL_TYPE_STRING:
+                    newCell.setCellValue(oldCell.getRichStringCellValue());
+                    break;
+            }
+        }
+    }   
+      
     private void btnLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoadMouseClicked
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         int result = fileChooser.showOpenDialog(null);
-        if (result == JFileChooser.APPROVE_OPTION) {	
+        if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             jLabel_FilePath.setText(selectedFile.getAbsolutePath());
             try {
                 FileReader reader = new FileReader(selectedFile.getAbsolutePath());
                 BufferedReader bufferedReader = new BufferedReader(reader);
-                
+
                 String firstLine = bufferedReader.readLine().trim();
                 String[] columnName = firstLine.split("\\s+");
                 blockListHeader.add(new BlockHeader(columnName[0], columnName[1], columnName[2], columnName[3], columnName[4], columnName[5]));
-                DefaultTableModel model = (DefaultTableModel)jTable.getModel();
+                DefaultTableModel model = (DefaultTableModel) jTable.getModel();
                 model.setColumnIdentifiers(columnName);
-                
+
                 Object[] tableLines = bufferedReader.lines().toArray();
-                
-                for(int i = 0; i < tableLines.length; i++) {
+
+                for (int i = 0; i < tableLines.length; i++) {
                     String line = tableLines[i].toString().trim();
                     String[] dataRow = line.split("\\s+");
                     blockList.add(new Block(Integer.parseInt(dataRow[0]), dataRow[1], Integer.parseInt(dataRow[2]), Integer.parseInt(dataRow[3]), Integer.parseInt(dataRow[4]), Integer.parseInt(dataRow[5])));
                     model.addRow(dataRow);
                 }
-                reader.close();                
-            }catch (Exception ex){
+                reader.close();
+                
+            } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
                 ex.printStackTrace();
             }
@@ -151,11 +211,10 @@ public class MainApp extends javax.swing.JFrame {
 
     private void btnSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSaveMouseClicked
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileFilter(new FileTypeFilter(".xls", "Excel File"));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         int result = fileChooser.showSaveDialog(null);
-        
-        
-        
+
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             try {
@@ -166,21 +225,30 @@ public class MainApp extends javax.swing.JFrame {
                 Cell cellSrednica = null;
                 Cell cellDlugosc = null;
                 Cell cellSztuki = null;
-                
-                cellNrPoz = worksheet.getRow(3).getCell(0);
-                cellSrednica = worksheet.getRow(3).getCell(1);
-                cellDlugosc = worksheet.getRow(3).getCell(2);
-                cellSztuki = worksheet.getRow(3).getCell(3);
-                
-                cellNrPoz.setCellValue(blockList.get(0).getNrPoz());
-                cellSrednica.setCellValue(blockList.get(0).getSrednica());
-                cellDlugosc.setCellValue(blockList.get(0).getDlugosc());
-                cellSztuki.setCellValue(blockList.get(0).getSztuki());
-                
+
+                for (int i = 0; i < blockList.size(); i++) {
+                    System.out.println(blockList.get(i));
+
+                    cellNrPoz = worksheet.getRow(i + 3).getCell(0);
+                    cellSrednica = worksheet.getRow(i + 3).getCell(1);
+                    cellDlugosc = worksheet.getRow(i + 3).getCell(2);
+                    cellSztuki = worksheet.getRow(i + 3).getCell(3);
+
+                    cellNrPoz.setCellValue(blockList.get(i).getNrPoz());
+                    cellSrednica.setCellValue(blockList.get(i).getSrednica());
+                    cellDlugosc.setCellValue(blockList.get(i).getDlugosc());
+                    cellSztuki.setCellValue(blockList.get(i).getSztuki());
+                    
+//                    if(i+1 != blockList.size()) {
+//                    copyRow(wb, worksheet, i + 3, i + 4);
+//                    }
+                    
+                }
+
                 HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
                 wb.createSheet("sheet");
                 fileInputStream.close();
-                
+
                 FileOutputStream fileOutputStream = new FileOutputStream(selectedFile.getAbsolutePath());
                 wb.write(fileOutputStream);
                 fileOutputStream.close();
