@@ -1,6 +1,6 @@
 package filereader;
 
-public class Block {
+public class Block implements Comparable {
     private int liczba;
     private String nazwa;
     private int dlugosc;
@@ -70,5 +70,12 @@ public class Block {
     
     public String toString(){
         return "Blok: " +getLiczba() + " " + getNazwa() + " " + getDlugosc() + " " + getNrPoz() + " " + getSrednica() + " " + getSztuki();
+    }
+
+    @Override
+    public int compareTo(Object t) {
+        int compareNrPoz = ((Block)t).getNrPoz();
+        // Ascending order
+        return this.nrPoz-compareNrPoz;
     }
 }

@@ -179,6 +179,7 @@ public class MainApp extends javax.swing.JFrame {
         fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         int result = fileChooser.showOpenDialog(null);
+        
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
             jLabel_FilePath.setText(selectedFile.getAbsolutePath());
@@ -206,7 +207,7 @@ public class MainApp extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
                 ex.printStackTrace();
             }
-        }
+        }       
     }//GEN-LAST:event_btnLoadMouseClicked
 
     private void btnSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSaveMouseClicked
@@ -214,6 +215,8 @@ public class MainApp extends javax.swing.JFrame {
         fileChooser.setFileFilter(new FileTypeFilter(".xls", "Excel File"));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         int result = fileChooser.showSaveDialog(null);
+        
+        Collections.sort(blockList);
 
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
