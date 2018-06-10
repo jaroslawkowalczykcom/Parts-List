@@ -11,10 +11,7 @@ import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -119,61 +116,7 @@ public class MainApp extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
-    private static void copyRow(HSSFWorkbook workbook, HSSFSheet worksheet, int sourceRowNum, int destinationRowNum) {
-        // Get the source / new row
-        HSSFRow newRow = worksheet.getRow(destinationRowNum);
-        HSSFRow sourceRow = worksheet.getRow(sourceRowNum);
-
-        // If the row exist in destination, push down all rows by 1 else create a new row
-        if (newRow != null) {
-            worksheet.shiftRows(destinationRowNum, worksheet.getLastRowNum(), 1);
-        } else {
-            newRow = worksheet.createRow(destinationRowNum);
-        }
-
-        // Loop through source columns to add to new row
-        for (int i = 0; i < sourceRow.getLastCellNum(); i++) {
-            // Grab a copy of the old/new cell
-            HSSFCell oldCell = sourceRow.getCell(i);
-            HSSFCell newCell = newRow.createCell(i);
-
-            // If the old cell is null jump to next cell
-            if (oldCell == null) {
-                newCell = null;
-                continue;
-            }
-
-            // Copy style from old cell and apply to new cell
-            HSSFCellStyle newCellStyle = workbook.createCellStyle();
-            newCellStyle.cloneStyleFrom(oldCell.getCellStyle());
-
-            newCell.setCellStyle(newCellStyle);
-
-            // Set the cell data value
-            switch (oldCell.getCellType()) {
-                case Cell.CELL_TYPE_BLANK:
-                    newCell.setCellValue(oldCell.getStringCellValue());
-                    break;
-                case Cell.CELL_TYPE_BOOLEAN:
-                    newCell.setCellValue(oldCell.getBooleanCellValue());
-                    break;
-                case Cell.CELL_TYPE_ERROR:
-                    newCell.setCellErrorValue(oldCell.getErrorCellValue());
-                    break;
-                case Cell.CELL_TYPE_FORMULA:
-                    newCell.setCellFormula(oldCell.getCellFormula());
-                    break;
-                case Cell.CELL_TYPE_NUMERIC:
-                    newCell.setCellValue(oldCell.getNumericCellValue());
-                    break;
-                case Cell.CELL_TYPE_STRING:
-                    newCell.setCellValue(oldCell.getRichStringCellValue());
-                    break;
-            }
-        }
-    }   
-      
+     
     private void btnLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoadMouseClicked
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
@@ -210,6 +153,7 @@ public class MainApp extends javax.swing.JFrame {
         }       
     }//GEN-LAST:event_btnLoadMouseClicked
 
+    
     private void btnSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSaveMouseClicked
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileTypeFilter(".xls", "Excel File"));
@@ -228,6 +172,7 @@ public class MainApp extends javax.swing.JFrame {
                 Cell cellSrednica = null;
                 Cell cellDlugosc = null;
                 Cell cellSztuki = null;
+                
 
                 for (int i = 0; i < blockList.size(); i++) {
                     System.out.println(blockList.get(i));
@@ -242,12 +187,66 @@ public class MainApp extends javax.swing.JFrame {
                     cellDlugosc.setCellValue(blockList.get(i).getDlugosc());
                     cellSztuki.setCellValue(blockList.get(i).getSztuki());
                     
-//                    if(i+1 != blockList.size()) {
-//                    copyRow(wb, worksheet, i + 3, i + 4);
+                  
+                    
+//                    if(blockList.get(i).getSrednica() != 6) {
+//                        worksheet.setColumnHidden(4, true);
+//                    } 
+//                    
+//                    if (blockList.get(i).getSrednica() != 8) {
+//                        worksheet.setColumnHidden(5, true);
 //                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 10) {
+//                        worksheet.setColumnHidden(6, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 12) {
+//                        worksheet.setColumnHidden(7, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 14) {
+//                        worksheet.setColumnHidden(8, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 16) {
+//                        worksheet.setColumnHidden(9, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 18) {
+//                        worksheet.setColumnHidden(10, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 20) {
+//                        worksheet.setColumnHidden(11, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 22) {
+//                        worksheet.setColumnHidden(12, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 25) {
+//                        worksheet.setColumnHidden(13, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 28) {
+//                        worksheet.setColumnHidden(14, true);
+//                    }
+//                    
+//                    if (blockList.get(i).getSrednica() != 32) {
+//                        worksheet.setColumnHidden(15, true);
+//                    }                     
+                    
                     
                 }
-
+                
+                int startHideRow = blockList.size() + 3;
+                int endHideRow = 202;   // Number depends on Excel sheet. Remember (lastRowToDelete - 1)
+               
+                for (int i = startHideRow; i <= endHideRow; i++) {
+                    worksheet.getRow(i).setHeight((short) 0);
+                }
+                
                 HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
                 wb.createSheet("sheet");
                 fileInputStream.close();
@@ -255,7 +254,7 @@ public class MainApp extends javax.swing.JFrame {
                 FileOutputStream fileOutputStream = new FileOutputStream(selectedFile.getAbsolutePath());
                 wb.write(fileOutputStream);
                 fileOutputStream.close();
-                JOptionPane.showMessageDialog(null, "Plik .xls został zaktualizowany");
+                JOptionPane.showMessageDialog(null, "Plik .xls został pomyślnie zapisany");
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
                 ex.printStackTrace();
