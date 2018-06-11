@@ -1,81 +1,82 @@
 package filereader;
 
 public class Block implements Comparable {
-    private int liczba;
-    private String nazwa;
-    private int dlugosc;
-    private int nrPoz;
-    private int srednica;
-    private int sztuki;
-    
-    public Block() {  
+    private String blockName;
+    private int barNumber;
+    private int barPieces;
+    private String barSymbol;
+    private int barDiameter;
+    private double barLength;
+
+    public Block() {
     }
-    
-    public Block(int liczba, String nazwa, int dlugosc, int nrPoz, int srednica, int sztuki) {
-        this.liczba = liczba;
-        this.nazwa = nazwa;
-        this.dlugosc = dlugosc;
-        this.nrPoz = nrPoz;
-        this.srednica = srednica;
-        this.sztuki = sztuki;
+
+    public Block(String blockName, int barNumber, int barPieces, String barSymbol, int barDiameter, double barLength) {
+        this.blockName = blockName;
+        this.barNumber = barNumber;
+        this.barPieces = barPieces;
+        this.barSymbol = barSymbol;
+        this.barDiameter = barDiameter;
+        this.barLength = barLength;
     }
-    
-    public int getLiczba() {
-        return this.liczba;
+
+    public String getBlockName() {
+        return blockName;
     }
-    
-    public void setLiczba(int liczba) {
-        this.liczba = liczba;
+
+    public void setBlockName(String blockName) {
+        this.blockName = blockName;
     }
-    
-    public String getNazwa() {
-        return this.nazwa;
+
+    public int getBarNumber() {
+        return barNumber;
     }
-    
-    public void setNazwa(String nazwa) {
-        this.nazwa = nazwa;
+
+    public void setBarNumber(int barNumber) {
+        this.barNumber = barNumber;
     }
-    
-    public int getDlugosc() {
-        return this.dlugosc;
+
+    public int getBarPieces() {
+        return barPieces;
     }
-    
-    public void setDlugosc(int dlugosc) {
-        this.dlugosc = dlugosc;
+
+    public void setBarPieces(int barPieces) {
+        this.barPieces = barPieces;
     }
-    
-    public int getNrPoz() {
-        return this.nrPoz;
+
+    public String getBarSymbol() {
+        return barSymbol;
     }
-    
-    public void setNrPoz(int nrPoz) {
-        this.nrPoz = nrPoz;
+
+    public void setBarSymbol(String barSymbol) {
+        this.barSymbol = barSymbol;
     }
-    
-    public int getSrednica() {
-        return this.srednica;
+
+    public int getBarDiameter() {
+        return barDiameter;
     }
-    
-    public void setSrednica(int srednica) {
-        this.srednica = srednica;
+
+    public void setBarDiameter(int barDiameter) {
+        this.barDiameter = barDiameter;
     }
-    
-    public int getSztuki() {
-        return this.sztuki;
+
+    public double getBarLength() {
+        return barLength;
     }
-    
-    public void setSztuki(int sztuki) {
-        this.sztuki = sztuki;
-    }
-    
-    public String toString(){
-        return "Blok: " +getLiczba() + " " + getNazwa() + " " + getDlugosc() + " " + getNrPoz() + " " + getSrednica() + " " + getSztuki();
+
+    public void setBarLength(double barLength) {
+        this.barLength = barLength;
     }
 
     @Override
     public int compareTo(Object t) {
-        int compareNrPoz = ((Block)t).getNrPoz();
+        int compareBarNumber = ((Block) t).getBarNumber();
         // Ascending order
-        return this.nrPoz-compareNrPoz;
+        return this.barNumber - compareBarNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "Block{" + " blockName=" + blockName + ", barNumber=" + barNumber + ", barPieces=" + barPieces + ", barSymbol=" + barSymbol + ", barDiameter=" + barDiameter + ", barLength=" + barLength + '}' +"\n";
     }
 }

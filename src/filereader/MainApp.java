@@ -12,7 +12,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
-import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,7 +21,6 @@ import org.apache.poi.ss.usermodel.Cell;
  */
 public class MainApp extends javax.swing.JFrame {
 
-    private List<BlockHeader> blockListHeader = new ArrayList<>();
     private List<Block> blockList = new ArrayList<>();
 
     public MainApp() {
@@ -39,6 +37,7 @@ public class MainApp extends javax.swing.JFrame {
         btnLoad = new javax.swing.JButton();
         jLabel_FilePath = new javax.swing.JLabel();
         btnSave = new javax.swing.JButton();
+        jTextField_BlockName = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -69,19 +68,23 @@ public class MainApp extends javax.swing.JFrame {
             }
         });
 
+        jTextField_BlockName.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextField_BlockName.setText("JK_OPIS_PRETA");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(17, 17, 17)
+                .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel_FilePath, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnLoad, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jTextField_BlockName, javax.swing.GroupLayout.DEFAULT_SIZE, 111, Short.MAX_VALUE)
+                            .addComponent(btnLoad, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 477, Short.MAX_VALUE))))
@@ -95,7 +98,9 @@ public class MainApp extends javax.swing.JFrame {
                         .addComponent(btnLoad)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSave)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 302, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addComponent(jTextField_BlockName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 260, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
@@ -123,6 +128,7 @@ public class MainApp extends javax.swing.JFrame {
         fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
         int result = fileChooser.showOpenDialog(null);
+        String blockName = jTextField_BlockName.getText();
         
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
@@ -131,19 +137,30 @@ public class MainApp extends javax.swing.JFrame {
                 FileReader reader = new FileReader(selectedFile.getAbsolutePath());
                 BufferedReader bufferedReader = new BufferedReader(reader);
 
-                String firstLine = bufferedReader.readLine().trim();
-                String[] columnName = firstLine.split("\\s+");
-                blockListHeader.add(new BlockHeader(columnName[0], columnName[1], columnName[2], columnName[3], columnName[4], columnName[5]));
+//                String firstLine = bufferedReader.readLine().trim();
+                String[] columnName = {"BLOCKNAME", "NUMBER", "PIECES", "SYMBOL", "DIAMETER", "LENGTH"};
+//                blockListHeader.add(new BlockHeader(columnName[0], columnName[1], columnName[2], columnName[3], columnName[4], columnName[5], columnName[6]));
                 DefaultTableModel model = (DefaultTableModel) jTable.getModel();
                 model.setColumnIdentifiers(columnName);
 
                 Object[] tableLines = bufferedReader.lines().toArray();
 
-                for (int i = 0; i < tableLines.length; i++) {
+                // i = 1 because in txt file line 0 is table Header
+                for (int i = 1; i < tableLines.length; i++) {
                     String line = tableLines[i].toString().trim();
                     String[] dataRow = line.split("\\s+");
-                    blockList.add(new Block(Integer.parseInt(dataRow[0]), dataRow[1], Integer.parseInt(dataRow[2]), Integer.parseInt(dataRow[3]), Integer.parseInt(dataRow[4]), Integer.parseInt(dataRow[5])));
-                    model.addRow(dataRow);
+                    
+                    // Block object without first column[0]
+                    Block theBlock = new Block(dataRow[1], Integer.parseInt(dataRow[2]), Integer.parseInt(dataRow[3]), dataRow[4], Integer.parseInt(dataRow[5]), Double.parseDouble(dataRow[6]));
+                    
+                    // Strings table to show data in jTable
+                    String[] dataTable = {dataRow[1], dataRow[2], dataRow[3], dataRow[4], dataRow[5], dataRow[6]};
+                    
+                    if (dataRow[1].equals(blockName)){
+                        blockList.add(theBlock);
+                    }
+                    
+                    model.addRow(dataTable);
                 }
                 reader.close();
                 
@@ -151,7 +168,9 @@ public class MainApp extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, ex.getMessage());
                 ex.printStackTrace();
             }
-        }       
+        }
+        // TEST
+        System.out.println(blockList);
     }//GEN-LAST:event_btnLoadMouseClicked
 
     
@@ -169,27 +188,27 @@ public class MainApp extends javax.swing.JFrame {
                 FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
                 HSSFWorkbook wb = new HSSFWorkbook(fileInputStream);
                 HSSFSheet worksheet = wb.getSheetAt(0);
-                Cell cellNrPoz = null;
-                Cell cellSrednica = null;
-                Cell cellDlugosc = null;
-                Cell cellSztuki = null;
+                Cell cellBarNumber = null;
+                Cell cellBarDiameter = null;
+                Cell cellBarLength = null;
+                Cell cellBarPieces = null;
                 
                 for (int i = 0; i < blockList.size(); i++) {
                     System.out.println(blockList.get(i));
 
-                    cellNrPoz = worksheet.getRow(i + 3).getCell(0);
-                    cellSrednica = worksheet.getRow(i + 3).getCell(1);
-                    cellDlugosc = worksheet.getRow(i + 3).getCell(2);
-                    cellSztuki = worksheet.getRow(i + 3).getCell(3);
+                    cellBarNumber = worksheet.getRow(i + 3).getCell(0);
+                    cellBarDiameter = worksheet.getRow(i + 3).getCell(1);
+                    cellBarLength = worksheet.getRow(i + 3).getCell(2);
+                    cellBarPieces = worksheet.getRow(i + 3).getCell(3);
 
-                    cellNrPoz.setCellValue(blockList.get(i).getNrPoz());
-                    cellSrednica.setCellValue(blockList.get(i).getSrednica());
-                    cellDlugosc.setCellValue(blockList.get(i).getDlugosc());
-                    cellSztuki.setCellValue(blockList.get(i).getSztuki());
+                    cellBarNumber.setCellValue(blockList.get(i).getBarNumber());
+                    cellBarDiameter.setCellValue(blockList.get(i).getBarDiameter());
+                    cellBarLength.setCellValue(blockList.get(i).getBarLength());
+                    cellBarPieces.setCellValue(blockList.get(i).getBarPieces());
                 }
                 
                 int startHideRow = blockList.size() + 3;
-                int endHideRow = 202;
+                int endHideRow = 202;                               // REMEMBER TO TYPE CORRECT VALUE FROM XLS SHEET
                 for (int i = startHideRow; i <= endHideRow; i++) {
                     worksheet.getRow(i).setHeight((short) 0);
                 }
@@ -312,5 +331,6 @@ public class MainApp extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable;
+    private javax.swing.JTextField jTextField_BlockName;
     // End of variables declaration//GEN-END:variables
 }
