@@ -44,6 +44,7 @@ public class MainApp extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Parts List Exporter");
 
         jTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -180,9 +181,22 @@ public class MainApp extends javax.swing.JFrame {
             rowData[5] = blockList.get(i).getBarLength();
             model.addRow(rowData);
         }
-    }    
+    }
+    
+    public void clearLisstAndJTable() {
+        DefaultTableModel model = (DefaultTableModel) jTable.getModel();
+        while (model.getRowCount() > 0) {
+            for (int i = 0; i < model.getRowCount(); i++) {
+                model.removeRow(i);
+            }
+        }
+        blockList.clear();
+        listOfPozNumber.clear();
+    }
     
     private void btnLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoadMouseClicked
+        clearLisstAndJTable();
+        
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home") + "/Desktop"));
