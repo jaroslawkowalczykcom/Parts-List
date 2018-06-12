@@ -77,6 +77,6 @@ public class Block implements Comparable {
 
     @Override
     public String toString() {
-        return "Block{" + " blockName=" + blockName + ", barNumber=" + barNumber + ", barPieces=" + barPieces + ", barSymbol=" + barSymbol + ", barDiameter=" + barDiameter + ", barLength=" + barLength + '}' +"\n";
+        return "Block{" + "blockName=" + blockName + ", barNumber=" + barNumber + ", barPieces=" + barPieces + ", barSymbol=" + barSymbol + ", barDiameter=" + barDiameter + ", barLength=" + barLength + '}' +"\n";
     }
 }
