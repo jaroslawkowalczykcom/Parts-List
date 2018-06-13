@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -162,6 +163,17 @@ public class MainApp extends javax.swing.JFrame {
         return false;
     }
     
+    public String showDuplicated() {
+        Set<Integer> set = new HashSet<Integer>(listOfPozNumber);
+        
+        List<Integer> one = new ArrayList<>(listOfPozNumber);
+        List<Integer> two = new ArrayList<>(set);
+        List<Integer> result = ListUtils.subtract(one, two);
+        
+        Collections.sort(result);
+        return result.toString();
+    }
+    
     public void addHeaderToJtable() {
         String[] columnName = {"BLOCKNAME", "NUMBER", "PIECES", "SYMBOL", "DIAMETER", "LENGTH"};
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
@@ -183,7 +195,7 @@ public class MainApp extends javax.swing.JFrame {
         }
     }
     
-    public void clearLisstAndJTable() {
+    public void clearListAndJTable() {
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
         while (model.getRowCount() > 0) {
             for (int i = 0; i < model.getRowCount(); i++) {
@@ -195,7 +207,7 @@ public class MainApp extends javax.swing.JFrame {
     }
     
     private void btnLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoadMouseClicked
-        clearLisstAndJTable();
+        clearListAndJTable();
         
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
@@ -221,7 +233,7 @@ public class MainApp extends javax.swing.JFrame {
         addRowToJtable();
         
         if(checkForDuplicates() == true) {
-            JOptionPane.showMessageDialog(null, "Uwaga występują pozycje o tych samych numerach!");
+            JOptionPane.showMessageDialog(null, "Uwaga występują pozycje o tych samych numerach! \n" + showDuplicated());
         }
     }//GEN-LAST:event_btnLoadMouseClicked
     
