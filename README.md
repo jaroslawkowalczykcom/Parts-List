@@ -3,8 +3,6 @@
 Desktop App importing list of exported attributes from AutoCad and save complete parts-list in .xls file. 
 If duplicated position numbers occurred application inform user by showing message on the screen.
 
-*Desktop App syncronised with Web App.*
-
 ## Functionality
 
 User:
