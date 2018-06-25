@@ -27,6 +27,9 @@ public class MainApp extends javax.swing.JFrame {
     private List<Block> blockList = new ArrayList<>();
     private List<Integer> listOfPozNumber = new ArrayList<>();
     
+    // Conf existing .xls patter file REMEMBER TO TYPE CORRECT VALUE
+    private int endHideRow = 202;       
+    
     public MainApp() {
         initComponents();
     }
@@ -195,7 +198,7 @@ public class MainApp extends javax.swing.JFrame {
         }
     }
     
-    public void clearListAndJTable() {
+    public void clearListsAndJTable() {
         DefaultTableModel model = (DefaultTableModel) jTable.getModel();
         while (model.getRowCount() > 0) {
             for (int i = 0; i < model.getRowCount(); i++) {
@@ -207,7 +210,7 @@ public class MainApp extends javax.swing.JFrame {
     }
     
     private void btnLoadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoadMouseClicked
-        clearListAndJTable();
+        clearListsAndJTable();
         
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileTypeFilter(".txt", "Text File"));
@@ -237,6 +240,98 @@ public class MainApp extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnLoadMouseClicked
     
+    public void assignXlsCellValueFromBlockList(HSSFSheet worksheet) {
+        Cell cellBarNumber = null;
+        Cell cellBarDiameter = null;
+        Cell cellBarLength = null;
+        Cell cellBarPieces = null;
+
+        for (int i = 0; i < blockList.size(); i++) {
+
+            cellBarNumber = worksheet.getRow(i + 3).getCell(0);
+            cellBarNumber.setCellValue(blockList.get(i).getBarNumber());
+            
+            cellBarDiameter = worksheet.getRow(i + 3).getCell(1);
+            cellBarDiameter.setCellValue(blockList.get(i).getBarDiameter());
+            
+            cellBarLength = worksheet.getRow(i + 3).getCell(2);
+            cellBarLength.setCellValue(blockList.get(i).getBarLength());
+            
+            cellBarPieces = worksheet.getRow(i + 3).getCell(3);
+            cellBarPieces.setCellValue(blockList.get(i).getBarPieces());
+        }
+    }
+    
+    public void hideUnusedXlsRows(HSSFSheet worksheet) {
+        int startHideRow = blockList.size() + 3;
+        for (int i = startHideRow; i <= endHideRow; i++) {
+            worksheet.getRow(i).setHeight((short) 0);
+        }
+    }
+    
+    public void hideUnusedXlsColumns(HSSFSheet worksheet) {
+        Cell fi6 = worksheet.getRow(endHideRow + 1).getCell(4);
+        Cell fi8 = worksheet.getRow(endHideRow + 1).getCell(5);
+        Cell fi10 = worksheet.getRow(endHideRow + 1).getCell(6);
+        Cell fi12 = worksheet.getRow(endHideRow + 1).getCell(7);
+        Cell fi14 = worksheet.getRow(endHideRow + 1).getCell(8);
+        Cell fi16 = worksheet.getRow(endHideRow + 1).getCell(9);
+        Cell fi18 = worksheet.getRow(endHideRow + 1).getCell(10);
+        Cell fi20 = worksheet.getRow(endHideRow + 1).getCell(11);
+        Cell fi22 = worksheet.getRow(endHideRow + 1).getCell(12);
+        Cell fi25 = worksheet.getRow(endHideRow + 1).getCell(13);
+        Cell fi28 = worksheet.getRow(endHideRow + 1).getCell(14);
+        Cell fi32 = worksheet.getRow(endHideRow + 1).getCell(15);
+
+        if (fi6.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(4,true);
+        }
+
+        if (fi8.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(5,true);
+        }
+
+        if (fi10.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(6,true);
+        }
+
+        if (fi12.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(7,true);
+        }
+
+        if (fi14.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(8,true);
+        }
+
+        if (fi16.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(9,true);
+        }
+
+        if (fi18.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(10,true);
+        }
+
+        if (fi20.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(11,true);
+        }
+
+        if (fi22.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(12,true);
+        }
+
+        if (fi25.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(13,true);
+        }
+
+        if (fi28.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(14,true);
+        }
+
+        if (fi32.getNumericCellValue() == 0) {
+            worksheet.setColumnHidden(15,true);
+        }               
+    }
+     
     private void btnSaveMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSaveMouseClicked
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileTypeFilter(".xls", "Excel File"));
@@ -251,95 +346,13 @@ public class MainApp extends javax.swing.JFrame {
                 FileInputStream fileInputStream = new FileInputStream(selectedFile.getAbsolutePath());
                 HSSFWorkbook wb = new HSSFWorkbook(fileInputStream);
                 HSSFSheet worksheet = wb.getSheetAt(0);
-                Cell cellBarNumber = null;
-                Cell cellBarDiameter = null;
-                Cell cellBarLength = null;
-                Cell cellBarPieces = null;
-                
-                for (int i = 0; i < blockList.size(); i++) {
-                    System.out.println(blockList.get(i));
-
-                    cellBarNumber = worksheet.getRow(i + 3).getCell(0);
-                    cellBarDiameter = worksheet.getRow(i + 3).getCell(1);
-                    cellBarLength = worksheet.getRow(i + 3).getCell(2);
-                    cellBarPieces = worksheet.getRow(i + 3).getCell(3);
-
-                    cellBarNumber.setCellValue(blockList.get(i).getBarNumber());
-                    cellBarDiameter.setCellValue(blockList.get(i).getBarDiameter());
-                    cellBarLength.setCellValue(blockList.get(i).getBarLength());
-                    cellBarPieces.setCellValue(blockList.get(i).getBarPieces());
-                }
-                
-                int startHideRow = blockList.size() + 3;
-                int endHideRow = 202;                               // REMEMBER TO TYPE CORRECT VALUE FROM XLS SHEET
-                for (int i = startHideRow; i <= endHideRow; i++) {
-                    worksheet.getRow(i).setHeight((short) 0);
-                }
+                assignXlsCellValueFromBlockList(worksheet);
+                hideUnusedXlsRows(worksheet);
                 
                 // Refreshing FormulaCells
                 HSSFFormulaEvaluator.evaluateAllFormulaCells(wb);
                 
-                Cell fi6 = worksheet.getRow(endHideRow + 1).getCell(4);
-                Cell fi8 = worksheet.getRow(endHideRow + 1).getCell(5);
-                Cell fi10 = worksheet.getRow(endHideRow + 1).getCell(6);
-                Cell fi12 = worksheet.getRow(endHideRow + 1).getCell(7);
-                Cell fi14 = worksheet.getRow(endHideRow + 1).getCell(8);
-                Cell fi16 = worksheet.getRow(endHideRow + 1).getCell(9);
-                Cell fi18 = worksheet.getRow(endHideRow + 1).getCell(10);
-                Cell fi20 = worksheet.getRow(endHideRow + 1).getCell(11);
-                Cell fi22 = worksheet.getRow(endHideRow + 1).getCell(12);
-                Cell fi25 = worksheet.getRow(endHideRow + 1).getCell(13);
-                Cell fi28 = worksheet.getRow(endHideRow + 1).getCell(14);
-                Cell fi32 = worksheet.getRow(endHideRow + 1).getCell(15);
-                
-                if (fi6.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(4,true);
-                }
-                
-                if (fi8.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(5,true);
-                }
-
-                if (fi10.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(6,true);
-                }
-
-                if (fi12.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(7,true);
-                }
-
-                if (fi14.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(8,true);
-                }
-
-                if (fi16.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(9,true);
-                }
-
-                if (fi18.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(10,true);
-                }
-
-                if (fi20.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(11,true);
-                }
-
-                if (fi22.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(12,true);
-                }
-
-                if (fi25.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(13,true);
-                }
-
-                if (fi28.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(14,true);
-                }
-
-                if (fi32.getNumericCellValue() == 0) {
-                    worksheet.setColumnHidden(15,true);
-                }                
-                
+                hideUnusedXlsColumns(worksheet);
                 
                 wb.createSheet("sheet");
                 fileInputStream.close();
